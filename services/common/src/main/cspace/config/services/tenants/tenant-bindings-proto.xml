@@ -2273,7 +2273,7 @@
 							<service:properties xmlns:service="http://collectionspace.org/services/common/service">
 								<types:item xmlns:types="http://collectionspace.org/services/common/types">
                                     <types:key>authRef</types:key>
-                                    <types:value>placeOwnershipGroupList/*/owner</types:value>
+                                    <types:value>placeOwnerGroupList/*/owner</types:value>
                                 </types:item>
                                 <types:item xmlns:types="http://collectionspace.org/services/common/types">
 									<types:key>termRef</types:key>
