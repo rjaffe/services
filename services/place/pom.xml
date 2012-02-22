@@ -13,12 +13,12 @@
     <packaging>pom</packaging>
 
     <dependencies>
-        <dependency>
+      <!--  <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authority.service</artifactId>
             <optional>true</optional>
             <version>${project.version}</version>
-        </dependency>    
+        </dependency>-->    
     </dependencies>
 
     <modules>

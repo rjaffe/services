@@ -72,11 +72,11 @@ public class PlaceAuthorityClientUtils {
     	value = placeInfo.get(PlaceJAXBSchema.DISPLAY_NAME_COMPUTED);
     	boolean displayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
     	place.setDisplayNameComputed(displayNameComputed);
-			if((value = (String)placeInfo.get(PlaceJAXBSchema.FULL_DISPLAY_NAME))!=null)
-				place.setFullDisplayName(value);
-    	value = placeInfo.get(PlaceJAXBSchema.FULL_DISPLAY_NAME_COMPUTED);
+			if((value = (String)placeInfo.get(PlaceJAXBSchema.DISPLAY_NAME))!=null)
+				place.setDisplayName(value);
+    	value = placeInfo.get(PlaceJAXBSchema.DISPLAY_NAME_COMPUTED);
     	displayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
-			place.setFullDisplayNameComputed(displayNameComputed);
+			place.setDisplayNameComputed(displayNameComputed);
 				/* TODO - think about how much to support. This approach to the client
 				 * does not scale! We should really favor the document/payload approach.
         if((value = (String)placeInfo.get(PlaceJAXBSchema.CONDITION_NOTE))!=null) {

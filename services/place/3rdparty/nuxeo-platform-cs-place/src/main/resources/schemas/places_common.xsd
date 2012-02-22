@@ -22,17 +22,16 @@
     <!--  Place Information Group -->
     <!--  inAuthority is the csid of the owning PlaceAuthority -->
     <xs:element name="inAuthority" type="xs:string" />
-		<xs:element name="shortIdentifier" type="xs:string"/>
+    <xs:element name="shortIdentifier" type="xs:string"/>
     <xs:element name="refName" type="xs:string"/>
     <xs:element name="termStatus" type="xs:string"/>
     <xs:element name="displayName" type="xs:string"/>
     <xs:element name="displayNameComputed" type="xs:boolean"/>
     <xs:element name="shortDisplayName" type="xs:string"/>
     <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
-    <xs:element name="fullDisplayName" type="xs:string"/>
-    <xs:element name="fullDisplayNameComputed" type="xs:boolean"/>
     <xs:element name="placeType" type="xs:string" />
     <xs:element name="placeRecordAdminStatus" type="xs:string" />
+    <xs:element name="placeIdentifier" type="xs:string" />
     <xs:element name="placeNameGroupList" type="placeNameGroupList"/>
     <xs:element name="placeOwnerGroupList" type="placeOwnerGroupList"/>
     <xs:element name="note" type="xs:string"/>
@@ -69,18 +68,18 @@
 
     <xs:complexType name="placeNameGroup">
         <xs:sequence>
-					<xs:element name="name" type="xs:string"/>
-					<xs:element name="displayName" type="xs:string"/>
-					<xs:element name="displayNameComputed" type="xs:boolean"/>
-					<xs:element name="nameLang" type="xs:string"/>
-					<xs:element name="nameAbbrev" type="xs:string"/>
-					<xs:element name="nameStatus" type="xs:string"/>
-					<xs:element name="nameSource" type="xs:string"/>
-					<xs:element name="nameSourceDetail" type="xs:string"/>
-					<xs:element name="nameSourceRefId" type="xs:string"/>
-					<xs:element name="nameNotes" type="xs:string"/>
-					<xs:element name="nameDates" type="xs:string"/>
-					<xs:element name="nameAdminStatus" type="xs:string"/>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="nameQualifiedName" type="xs:string"/>
+			<xs:element name="nameLanguage" type="xs:string"/>
+			<xs:element name="nameAbbrev" type="xs:string"/>
+			<xs:element name="nameType" type="xs:string"/>
+			<xs:element name="nameStatus" type="xs:string"/>
+			<xs:element name="nameSource" type="xs:string"/>
+			<xs:element name="nameSourceDetail" type="xs:string"/>
+			<xs:element name="nameSourceRefId" type="xs:string"/>
+			<xs:element name="nameNote" type="xs:string"/>
+			<xs:element name="nameDateGroup" type="structuredDateGroup"/>
+			<xs:element name="nameAdminStatus" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
     
@@ -92,8 +91,9 @@
 
     <xs:complexType name="placeOwnerGroup">
         <xs:sequence>
-					<xs:element name="owner" type="xs:string"/>
-					<xs:element name="ownerDate" type="xs:string"/>
+			<xs:element name="owner" type="xs:string"/>
+			<xs:element name="ownershipDateGroup" type="structuredDateGroup"/>
+			<xs:element name="ownershipNote" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
     
@@ -105,23 +105,53 @@
 
     <xs:complexType name="placeGeoRefGroup">
         <xs:sequence>
-					<xs:element name="decimalLatitude" type="xs:decimal"/>
-					<xs:element name="decimalLongitude" type="xs:decimal"/>
-					<xs:element name="geodeticDatum" type="xs:string"/>
-					<xs:element name="coordUncertaintyInMeters" type="xs:integer"/>
-					<xs:element name="coordPrecision" type="xs:string"/>
-					<xs:element name="pointRadiusSpatialFit" type="xs:string"/>
-					<xs:element name="footprintWKT" type="xs:string"/>
-					<xs:element name="footprintSRS" type="xs:string"/>
-					<xs:element name="footprintSpatialFit" type="xs:string"/>
-					<xs:element name="geoReferencedBy" type="xs:string"/>
-					<xs:element name="geoRefDate" type="xs:string"/>
-					<xs:element name="geoRefProtocol" type="xs:string"/>
-					<xs:element name="geoRefSource" type="xs:string"/>
-					<xs:element name="geoRefVerificationStatus" type="xs:string"/>
-					<xs:element name="geoRefRemarks" type="xs:string"/>
-					<xs:element name="geoRefPlaceName" type="xs:string"/>
+            <xs:element name="decimalLatitude" type="xs:decimal"/>
+            <xs:element name="decimalLongitude" type="xs:decimal"/>
+            <xs:element name="geodeticDatum" type="xs:string"/>
+            <xs:element name="coordUncertaintyInMeters" type="xs:integer"/>
+            <xs:element name="coordPrecision" type="xs:string"/>
+            <xs:element name="pointRadiusSpatialFit" type="xs:string"/>
+            <xs:element name="footprintWKT" type="xs:string"/>
+            <xs:element name="footprintSRS" type="xs:string"/>
+            <xs:element name="footprintSpatialFit" type="xs:string"/>
+            <xs:element name="geoReferencedBy" type="xs:string"/>
+            <xs:element name="geoRefDate" type="xs:string"/>
+            <xs:element name="geoRefProtocol" type="xs:string"/>
+            <xs:element name="geoRefSource" type="xs:string"/>
+            <xs:element name="geoRefVerificationStatus" type="xs:string"/>
+            <xs:element name="geoRefRemarks" type="xs:string"/>
+            <xs:element name="geoRefPlaceName" type="xs:string"/>
        </xs:sequence>
+    </xs:complexType>
+
+    <!-- IMPORTANT: This structuredDateGroup MUST MATCH EXACTLY structuredDateGroups in other services, for example collectionobject.
+         Use your favorite text editor to REPLICATE IN THOSE OTHER INSTANCES ANY CHANGES MADE HERE. -->
+    <xs:complexType name="structuredDateGroup">
+        <xs:sequence>
+            <xs:element name="dateDisplayDate" type="xs:string"/>
+            <xs:element name="dateAssociation" type="xs:string"/>
+            <xs:element name="dateEarliestSingleYear" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleDay" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleEra" type="xs:string"/>
+            <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
+            <xs:element name="dateLatestYear" type="xs:integer"/>
+            <xs:element name="dateLatestMonth" type="xs:integer"/>
+            <xs:element name="dateLatestDay" type="xs:integer"/>
+            <xs:element name="dateLatestEra" type="xs:string"/>
+            <xs:element name="dateLatestCertainty" type="xs:string"/>
+            <xs:element name="dateLatestQualifier" type="xs:string"/>
+            <xs:element name="dateLatestQualifierValue" type="xs:integer"/>
+            <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
+            <xs:element name="datePeriod" type="xs:string"/>
+            <xs:element name="dateNote" type="xs:string"/>
+            <xs:element name="dateEarliestScalarValue" type="xs:date"/>
+            <xs:element name="dateLatestScalarValue" type="xs:date"/>
+            <xs:element name="scalarValuesComputed" type="xs:boolean"/>
+        </xs:sequence>
     </xs:complexType>
 </xs:schema>
 

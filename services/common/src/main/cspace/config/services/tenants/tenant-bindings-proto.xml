@@ -2272,15 +2272,57 @@
 						<service:part id="1" control_group="Managed" versionable="true" auditable="false" label="places_common" updated="" order="1">
 							<service:properties xmlns:service="http://collectionspace.org/services/common/service">
 								<types:item xmlns:types="http://collectionspace.org/services/common/types">
+                                    <types:key>authRef</types:key>
+                                    <types:value>placeOwnershipGroupList/*/owner</types:value>
+                                </types:item>
+                                <types:item xmlns:types="http://collectionspace.org/services/common/types">
 									<types:key>termRef</types:key>
 									<types:value>termStatus</types:value>
 								</types:item>
-								<!-- NEEDS Attention - what are the termRef fields in a Place? 
 								<types:item xmlns:types="http://collectionspace.org/services/common/types">
 									<types:key>termRef</types:key>
 									<types:value>placeType</types:value>
 								</types:item>
-										 -->
+								<types:item xmlns:types="http://collectionspace.org/services/common/types">
+									<types:key>termRef</types:key>
+									<types:value>placeNameGroupList/*/nameLanguage</types:value>
+								</types:item>
+                                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+									<types:key>termRef</types:key>
+									<types:value>placeNameGroupList/*/nameType</types:value>
+                                </types:item>
+                                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+									<types:key>termRef</types:key>
+									<types:value>placeNameGroupList/*/nameStatus</types:value>
+                                </types:item>
+                                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+									<types:key>termRef</types:key>
+									<types:value>placeNameGroupList/*/nameAdminStatus</types:value>
+                                </types:item>
+                                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+									<types:key>termRef</types:key>
+									<types:value>vCoordSys</types:value>
+                                </types:item>
+                                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+									<types:key>termRef</types:key>
+									<types:value>vSpatialReferenceSystem</types:value>
+                                </types:item>
+                                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+									<types:key>termRef</types:key>
+									<types:value>vUnitofMeasure</types:value>
+                                </types:item>
+                                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+									<types:key>termRef</types:key>
+									<types:value>placeGeoRefGroupList/*/geodeticDatum</types:value>
+                                </types:item>
+                                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+									<types:key>termRef</types:key>
+									<types:value>placeGeoRefGroupList/*/geoRefProtocol</types:value>
+                                </types:item>
+                                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+									<types:key>termRef</types:key>
+									<types:value>placeGeoRefGroupList/*/geoRefVerificationStatus</types:value>
+								</types:item>
 							</service:properties>
 							<service:content contentType="application/xml">
 								<service:xmlContent namespaceURI="http://collectionspace.org/services/place" schemaLocation="http://collectionspace.org/services/place http://services.collectionspace.org/place/places_common.xsd" />
