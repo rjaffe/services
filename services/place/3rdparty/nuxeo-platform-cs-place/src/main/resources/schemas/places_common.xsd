@@ -115,7 +115,7 @@
             <xs:element name="footprintSRS" type="xs:string"/>
             <xs:element name="footprintSpatialFit" type="xs:string"/>
             <xs:element name="geoReferencedBy" type="xs:string"/>
-            <xs:element name="geoRefDate" type="xs:string"/>
+            <xs:element name="geoRefDateGroup" type="structuredDateGroup"/>
             <xs:element name="geoRefProtocol" type="xs:string"/>
             <xs:element name="geoRefSource" type="xs:string"/>
             <xs:element name="geoRefVerificationStatus" type="xs:string"/>
