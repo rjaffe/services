@@ -99,6 +99,8 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
     final String TEST_PLACE_TYPE = "City";
     // TODO Make status type be a controlled vocab term.
     final String TEST_STATUS = "Approved";
+    final String TEST_DISPLAY_DATE = "This year";
+    final String TEST_EARLIEST_SINGLE_YEAR = "2012";
     
     /** The known resource id. */
     private String knownResourceId = null;
@@ -252,7 +254,11 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         		+ "<placeNameGroupList>"
         		  + "<placeNameGroup>"
         		    + "<name>"+TEST_NAME+"</name>"
-        		    + "<displayNameComputed>false</displayNameComputed>"
+        		  //  + "<displayNameComputed>false</displayNameComputed>"
+        		    + "<nameDateGroup>"
+        		      + "<dateDisplayDate>"+TEST_DISPLAY_DATE+"</dateDisplayDate>"
+        		      + "<dateEarliestSingleYear>"+TEST_EARLIEST_SINGLE_YEAR+"</dateEarliestSingleYear>"
+        		    + "</nameDateGroup>"
         		  + "</placeNameGroup>"
         		+ "</placeNameGroupList>"        		
         		+ "<shortDisplayName>"+TEST_NAME+"</shortDisplayName>"
