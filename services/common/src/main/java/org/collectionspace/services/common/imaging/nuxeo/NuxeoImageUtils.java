@@ -16,7 +16,7 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright © 2009 {Contributing Institution}
+ * Copyright © 2009 {Contributing Institution}.
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -38,8 +38,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.api.ServiceManager;
-import org.nuxeo.runtime.api.ServiceDescriptor;
+//import org.nuxeo.runtime.api.ServiceManager;
+//import org.nuxeo.runtime.api.ServiceDescriptor;
 
 //import org.nuxeo.common.utils.FileUtils;
 
@@ -57,8 +57,8 @@ import org.nuxeo.ecm.core.repository.RepositoryDescriptor;
 import org.nuxeo.ecm.core.repository.RepositoryManager;
 
 import org.nuxeo.ecm.core.repository.RepositoryService;
-import org.nuxeo.runtime.model.ComponentManager;
-import org.nuxeo.runtime.model.impl.ComponentManagerImpl;
+//import org.nuxeo.runtime.model.ComponentManager;
+//import org.nuxeo.runtime.model.impl.ComponentManagerImpl;
 //import org.nuxeo.ecm.core.api.ejb.DocumentManagerBean;
 //import org.nuxeo.ecm.core.storage.sql.RepositoryImpl;
 //import org.nuxeo.ecm.core.storage.sql.Repository;
@@ -725,10 +725,14 @@ public class NuxeoImageUtils {
 			String digestAlgorithm = getFileManagerService()
 					.getDigestAlgorithm(); // Need some way on initializing the
 											// FileManager with a call.
+			
+			logger.debug("Start --> Calling Nuxeo to create an image blob.");
 			DocumentModel documentModel = getFileManagerService()
 					.createDocumentFromBlob(nuxeoSession, fileBlob,
 							blobLocation.getPathAsString(), true,
 							file.getName());
+			logger.debug("Stop --> Calling Nuxeo to create an image blob.");
+			
 			result = createBlobsCommon(documentModel, fileBlob);
 		} catch (Exception e) {
 			result = null;
