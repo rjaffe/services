@@ -22,18 +22,17 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.collectionspace.services.PlaceJAXBSchema;
+import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.client.PlaceAuthorityClient;
 import org.collectionspace.services.client.PlaceAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -42,8 +41,6 @@ import org.collectionspace.services.place.PlacesCommon;
 import org.collectionspace.services.place.PlaceNameGroup;
 import org.collectionspace.services.place.PlaceNameGroupList;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.slf4j.Logger;
@@ -60,7 +57,7 @@ import org.testng.annotations.Test;
  * $LastChangedRevision: 753 $
  * $LastChangedDate: 2009-09-23 11:03:36 -0700 (Wed, 23 Sep 2009) $
  */
-public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: Test classes for Vocab, Person, Org, and Place should have a base class!
+public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<PlaceauthoritiesCommon, PlacesCommon> {
 
     /** The logger. */
     private final String CLASS_NAME = PlaceAuthorityServiceTest.class.getName();
@@ -95,139 +92,28 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
     final String TEST_DNAME = "San Jose, CA";
     final String TEST_NAME = "San Jose";
     final String TEST_SHORTID = "sanjose";
-    // TODO Make loc type be a controlled vocab term.
+    // TODO Make place type be a controlled vocab term.
     final String TEST_PLACE_TYPE = "City";
     // TODO Make status type be a controlled vocab term.
     final String TEST_STATUS = "Approved";
+    final String TEST_NOTE = "My hometown";
+    final String TEST_SOURCE = "Peralta's Places of California";
+    final String TEST_SOURCE_PAGE = "p.21";
     final String TEST_DISPLAY_DATE = "This year";
     final String TEST_EARLIEST_SINGLE_YEAR = "2012";
     
     /** The known resource id. */
-    private String knownResourceId = null;
     private String knownResourceShortIdentifer = null;
     private String knownResourceRefName = null;
+    
     private String knownPlaceTypeRefName = null;
-    private String knownItemResourceId = null;
-    private String knownItemResourceShortIdentifer = null;
-    private String knownContactResourceId = null;
     
-    /** The n items to create in list. */
-    private int nItemsToCreateInList = 3;
-    
-    /** The all resource ids created. */
-    private List<String> allResourceIdsCreated = new ArrayList<String>();
-    
-    /** The all item resource ids created. */
-    private Map<String, String> allItemResourceIdsCreated =
-        new HashMap<String, String>();
-    
-    protected void setKnownResource( String id, String shortIdentifer,
-    		String refName ) {
-    	knownResourceId = id;
-    	knownResourceShortIdentifer = shortIdentifer;
-    	knownResourceRefName = refName;
-    }
-
-    protected void setKnownItemResource( String id, String shortIdentifer ) {
-    	knownItemResourceId = id;
-    	knownItemResourceShortIdentifer = shortIdentifer;
-    }
-
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
     protected CollectionSpaceClient getClientInstance() {
-    	return new PlaceAuthorityClient();
-    }
-    
-    @Override
-    protected PoxPayloadOut createInstance(String identifier) {
-    	PlaceAuthorityClient client = new PlaceAuthorityClient();
-        String shortId = identifier;
-    	String displayName = "displayName-" + shortId;
-    	PoxPayloadOut multipart = 
-            PlaceAuthorityClientUtils.createPlaceAuthorityInstance(
-    	    displayName, shortId, client.getCommonPartName());
-    	return multipart;
-    }
-        
-    // ---------------------------------------------------------------
-    // CRUD tests : CREATE tests
-    // ---------------------------------------------------------------
-    // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"create"})
-    public void create(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup, such as initializing the type of service request
-        // (e.g. CREATE, DELETE), its valid and expected status codes, and
-        // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate();
-
-        // Submit the request to the service and store the response.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-        String shortId = createIdentifier();
-    	String displayName = "displayName-" + shortId;
-    	
-    	PoxPayloadOut multipart = 
-            PlaceAuthorityClientUtils.createPlaceAuthorityInstance(
-    	    displayName, shortId, client.getCommonPartName());
-    	String newID = null;
-        ClientResponse<Response> res = client.create(multipart);
-        try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        //
-	        // Specifically:
-	        // Does it fall within the set of valid status codes?
-	        // Does it exactly match the expected status code?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(this.REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(this.REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
-	
-	        newID = PlaceAuthorityClientUtils.extractId(res);
-        } finally {
-        	res.releaseConnection();
-        }
-        // Store the ID returned from the first resource created
-        // for additional tests below.
-        if (knownResourceId == null){
-        	setKnownResource( newID, shortId, EMPTY_REFNAME);
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": knownResourceId=" + knownResourceId);
-            }
-        }
-        // Store the IDs from every resource created by tests,
-        // so they can be deleted after tests have been run.
-        allResourceIdsCreated.add(newID);
-    }
-
-    /**
-     * Creates the item.
-     *
-     * @param testName the test name
-     */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"create"}, dependsOnMethods = {"create"})
-    public void createItem(String testName) {
-        if(logger.isDebugEnabled()){
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        setupCreate();
-        createItemInAuthority(knownResourceId, EMPTY_REFNAME);
+        return new PlaceAuthorityClient();
     }
 
     /**
@@ -238,45 +124,23 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
      * @return the string
      */
     private String createItemInAuthority(String vcsid, String authRefName) {
-
-        final String testName = "createItemInAuthority("+vcsid+","+authRefName+")";
-        if(logger.isDebugEnabled()){
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-
+        final String testName = "createItemInAuthority("+vcsid+","+authRefName+")"; 
+    
         // Submit the request to the service and store the response.
         PlaceAuthorityClient client = new PlaceAuthorityClient();
-        String commonPartXML = 
-        	"<ns2:places_common xmlns:ns2=\"http://collectionspace.org/services/place\" >"
-        		+ "<shortIdentifier>"+TEST_SHORTID+"</shortIdentifier>"
-        		+ "<displayName>"+TEST_DNAME+"</displayName>"
-        		+ "<displayNameComputed>false</displayNameComputed>"
-        		+ "<placeNameGroupList>"
-        		  + "<placeNameGroup>"
-        		    + "<name>"+TEST_NAME+"</name>"
-        		  //  + "<displayNameComputed>false</displayNameComputed>"
-        		    + "<nameDateGroup>"
-        		      + "<dateDisplayDate>"+TEST_DISPLAY_DATE+"</dateDisplayDate>"
-        		      + "<dateEarliestSingleYear>"+TEST_EARLIEST_SINGLE_YEAR+"</dateEarliestSingleYear>"
-        		    + "</nameDateGroup>"
-        		  + "</placeNameGroup>"
-        		+ "</placeNameGroupList>"        		
-        		+ "<shortDisplayName>"+TEST_NAME+"</shortDisplayName>"
-        		+ "<shortDisplayNameComputed>false</shortDisplayNameComputed>"
-        		+ "<placeType>"+TEST_PLACE_TYPE+"</placeType>"
-        		+ "<termStatus>"+TEST_STATUS+"</termStatus>"
-        	+ "</ns2:places_common>";
-
-        String newID = null; 
-        try {
-        	newID = PlaceAuthorityClientUtils.createItemInAuthority(vcsid,
-        								commonPartXML, client );
-        } catch (org.dom4j.DocumentException de) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ".createItemInAuthority: Bad payload error" + 
-                				de.getLocalizedMessage());
-            }
-        }
+        Map<String, String> sanjoseMap = new HashMap<String,String>();
+        // TODO Make place type and status be controlled vocabs.
+        sanjoseMap.put(PlaceJAXBSchema.DISPLAY_NAME, TEST_DNAME);
+        sanjoseMap.put(PlaceJAXBSchema.SHORT_IDENTIFIER, TEST_SHORTID);
+        sanjoseMap.put(PlaceJAXBSchema.NAME, TEST_NAME);
+        sanjoseMap.put(PlaceJAXBSchema.NOTE, TEST_NOTE);
+        sanjoseMap.put(PlaceJAXBSchema.SOURCE, TEST_SOURCE);
+        sanjoseMap.put(PlaceJAXBSchema.SOURCE_PAGE, TEST_SOURCE_PAGE);
+        sanjoseMap.put(PlaceJAXBSchema.PLACE_TYPE, TEST_PLACE_TYPE);
+        sanjoseMap.put(PlaceJAXBSchema.TERM_STATUS, TEST_STATUS);
+        
+        String newID = PlaceAuthorityClientUtils.createItemInAuthority(vcsid,
+        		authRefName, sanjoseMap, client );    
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -286,215 +150,13 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
                 logger.debug(testName + ": knownItemResourceId=" + newID);
             }
         }
-
+        
         // Store the IDs from any item resources created
         // by tests, along with the IDs of their parents, so these items
         // can be deleted after all tests have been run.
-        allItemResourceIdsCreated.put(newID, vcsid);
+        allResourceItemIdsCreated.put(newID, vcsid);
 
         return newID;
-    }
-    
-    private void setPrimaryPlaceName(PlacesCommon place, String name) {
-        PlaceNameGroupList nameGroupList = place.getPlaceNameGroupList();
-        List<PlaceNameGroup> list = nameGroupList.getPlaceNameGroup();
-        PlaceNameGroup primaryNameGroup;
-        if(list == null ) {
-        	list = new ArrayList<PlaceNameGroup>();
-        }
-        if ( list.size() == 0 ) {
-        	primaryNameGroup = new PlaceNameGroup();
-        	list.add(primaryNameGroup);
-        } else {
-        	primaryNameGroup = list.get(0);
-        }
-        primaryNameGroup.setName(name);
-    }
-
-    private String getPrimaryPlaceName(PlacesCommon place) {
-        PlaceNameGroupList nameGroupList = place.getPlaceNameGroupList();
-        List<PlaceNameGroup> list = nameGroupList.getPlaceNameGroup();
-        String name = null;
-        if(list != null && list.size() > 0) {
-        	PlaceNameGroup primaryNameGroup = list.get(0);
-            name = primaryNameGroup.getName();
-        }
-        return name;
-    }
-
-
-
-    // Failure outcomes
-
-    // Placeholders until the three tests below can be uncommented.
-    // See Issue CSPACE-401.
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithEmptyEntityBody(java.lang.String)
-     */
-    @Override
-    public void createWithEmptyEntityBody(String testName) throws Exception {
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithMalformedXml(java.lang.String)
-     */
-    @Override
-    public void createWithMalformedXml(String testName) throws Exception {
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithWrongXmlSchema(java.lang.String)
-     */
-    @Override
-    public void createWithWrongXmlSchema(String testName) throws Exception {
-    }
-
-
-    // ---------------------------------------------------------------
-    // CRUD tests : CREATE LIST tests
-    // ---------------------------------------------------------------
-    // Success outcomes
-    /* (non-Javadoc)
-	 * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
-	 */
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"createList"}, dependsOnGroups = {"create"})
-    public void createList(String testName) throws Exception {
-        for (int i = 0; i < nItemsToCreateInList; i++) {
-            create(testName);
-        }
-    }
-
-    /**
-     * Creates the item list.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"createList"}, dependsOnMethods = {"createList"})
-    public void createItemList(String testName) throws Exception {
-        // Add items to the initially-created, known parent record.
-        for (int j = 0; j < nItemsToCreateInList; j++) {
-            createItem(testName);
-        }
-    }
-
-    // ---------------------------------------------------------------
-    // CRUD tests : READ tests
-    // ---------------------------------------------------------------
-    // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"read"}, dependsOnGroups = {"create"})
-    public void read(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupRead();
-        
-        // Submit the request to the service and store the response.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-    	String newID = null;
-        ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-        try {
-	        //FIXME: remove the following try catch once Aron fixes signatures
-	        try {
-	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	            PlaceauthoritiesCommon placeAuthority = 
-	            	(PlaceauthoritiesCommon) extractPart(input,
-	                    client.getCommonPartName(), PlaceauthoritiesCommon.class);
-	            Assert.assertNotNull(placeAuthority);
-	            Assert.assertNotNull(placeAuthority.getDisplayName());
-	            Assert.assertNotNull(placeAuthority.getShortIdentifier());
-	            Assert.assertNotNull(placeAuthority.getRefName());
-	        } catch (Exception e) {
-	            throw new RuntimeException(e);
-	        }
-        } finally {
-        	res.releaseConnection();
-        }
-    }
-
-    /**
-     * Read by name.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-            groups = {"read"}, dependsOnGroups = {"create"})
-        public void readByName(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName+"("+knownResourceShortIdentifer+")", CLASS_NAME));
-        }
-        // Perform setup.
-        setupRead();
-
-        // Submit the request to the service and store the response.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-        ClientResponse<String> res = client.readByName(knownResourceShortIdentifer);
-        assertStatusCode(res, testName);
-        try {
-	        //FIXME: remove the following try catch once Aron fixes signatures
-	        try {
-	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	            PlaceauthoritiesCommon placeAuthority = (PlaceauthoritiesCommon) extractPart(input,
-	                    client.getCommonPartName(), PlaceauthoritiesCommon.class);
-	            Assert.assertNotNull(placeAuthority);
-	        } catch (Exception e) {
-	            throw new RuntimeException(e);
-	        }
-        } finally {
-        	res.releaseConnection();
-        }
-    }
-
-
-    /**
-	 * Read item.
-	 *
-	 * @param testName the test name
-	 * @throws Exception the exception
-	 */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"read"}, dependsOnMethods = {"read"})
-    public void readItem(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupRead();
-
-        // Submit the request to the service and store the response.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-        assertStatusCode(res, testName);
-        try {
- 	        // Check whether we've received a place.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        PlacesCommon place = (PlacesCommon) extractPart(input,
-	                client.getItemCommonPartName(), PlacesCommon.class);
-	        Assert.assertNotNull(place);
-	        boolean showFull = true;
-	        if(showFull && logger.isDebugEnabled()){
-	            logger.debug(testName + ": returned payload:");
-	            logger.debug(objectAsXmlString(place, PlacesCommon.class));
-	        }
-	        Assert.assertEquals(place.getInAuthority(), knownResourceId);
-	    } finally {
-	    	res.releaseConnection();
-	    }
-
     }
 
     /**
@@ -503,88 +165,118 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-    		groups = {"update"}, dependsOnMethods = {"readItem", "updateItem"})
+    @Test(dataProvider="testName", 
+        dependsOnMethods = {"readItem", "updateItem"})
     public void verifyItemDisplayName(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
-        setupUpdate();
-
-        // Submit the request to the service and store the response.
+        setupRead();
+        //
+        // First, read our known item resource
+        //
         PlaceAuthorityClient client = new PlaceAuthorityClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-        assertStatusCode(res, testName);
+        PlacesCommon place = null;
         try {
+            assertStatusCode(res, testName);
 	        // Check whether place has expected displayName.
 	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        PlacesCommon place = (PlacesCommon) extractPart(input,
+	        place = (PlacesCommon) extractPart(input,
 	                client.getItemCommonPartName(), PlacesCommon.class);
 	        Assert.assertNotNull(place);
-	        String displayName = place.getDisplayName();
-	        // Make sure displayName matches computed form
-	        // Update the primary placeName and verify the computed name is updated.
-	        place.setCsid(null);
-	        place.setDisplayNameComputed(true);
-	        setPrimaryPlaceName(place, "updated-" + TEST_NAME);
-	        String expectedDisplayName = 
-	            PlaceAuthorityClientUtils.prepareDefaultDisplayName("updated-" + TEST_NAME);
-	
-	        // Submit the updated resource to the service and store the response.
-	        PoxPayloadOut output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-	        PayloadOutputPart commonPart = output.addPart(place, MediaType.APPLICATION_XML_TYPE);
-	        commonPart.setLabel(client.getItemCommonPartName());
-					res.releaseConnection();
-	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-					assertStatusCode(res, testName);
- 	
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
+        }
+        //
+        // Now prepare an updated payload.
+        //
+        String displayName = place.getDisplayName();
+        // Make sure displayName matches computed form
+        String expectedDisplayName = 
+            PlaceAuthorityClientUtils.prepareDefaultDisplayName(TEST_NAME);
+        Assert.assertNotNull(displayName, expectedDisplayName);
+        
+        // Update the shortName and verify the computed name is updated.
+        place.setCsid(null);
+        place.setDisplayNameComputed(true);
+        
+         // Verify the contents of this resource
+        PlaceNameGroupList placeNameGroupList = place.getPlaceNameGroupList();
+        Assert.assertNotNull(placeNameGroupList);
+        List<PlaceNameGroup> placeNameGroups = placeNameGroupList.getPlaceNameGroup();
+        Assert.assertNotNull(placeNameGroups);
+        Assert.assertTrue(placeNameGroups.size() > 0);
+        String name = placeNameGroups.get(0).getName();
+        Assert.assertNotNull(name);
+
+        // Update the contents of this resource.
+        final String PLACE_NAME_ADDITION = "verify-item-place-name-updated";
+        placeNameGroups.get(0).setName(PLACE_NAME_ADDITION + TEST_NAME);
+        place.setPlaceNameGroupList(placeNameGroupList);
+        if (logger.isDebugEnabled()) {
+            logger.debug("to be updated Place");
+            logger.debug(objectAsXmlString(place,
+                    PlacesCommon.class));
+        }
+        expectedDisplayName = 
+            PlaceAuthorityClientUtils.prepareDefaultDisplayName(PLACE_NAME_ADDITION + TEST_NAME);
+
+        // Submit the updated resource to the service and store the response.
+        PoxPayloadOut output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), place);
+
+        setupUpdate();        
+        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+        PlacesCommon updatedPlace = null;
+        try {
+        	assertStatusCode(res, testName);
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = new PoxPayloadIn(res.getEntity());
-	        PlacesCommon updatedPlace =
-	                (PlacesCommon) extractPart(input,
+        	PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        updatedPlace = (PlacesCommon) extractPart(input,
 	                        client.getItemCommonPartName(), PlacesCommon.class);
 	        Assert.assertNotNull(updatedPlace);
-	
-	        // Verify that the updated resource received the correct data.
-	        Assert.assertEquals(getPrimaryPlaceName(updatedPlace), 
-	        					getPrimaryPlaceName(place),
-	            "Updated Name in Place did not match submitted data.");
-	        // Verify that the updated resource computes the right displayName.
-	        Assert.assertEquals(updatedPlace.getDisplayName(), expectedDisplayName,
-	            "Updated ForeName in Place not reflected in computed DisplayName.");
-	
-	        // Now Update the displayName, not computed and verify the computed name is overriden.
-	        place.setDisplayNameComputed(false);
-	        expectedDisplayName = "TestName";
-	        place.setDisplayName(expectedDisplayName);
-	
-	        // Submit the updated resource to the service and store the response.
-	        output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-	        commonPart = output.addPart(place, MediaType.APPLICATION_XML_TYPE);
-	        commonPart.setLabel(client.getItemCommonPartName());
-					res.releaseConnection();
-	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-					assertStatusCode(res, testName);
- 	
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
+        }
+
+        // Verify that the updated resource computes the right displayName.
+        Assert.assertEquals(updatedPlace.getDisplayName(), expectedDisplayName,
+            "Updated DisplayName in Place not reflected in computed DisplayName.");
+        //
+        // Now Update the displayName, not computed and verify the computed name is overriden.
+        //
+        place.setDisplayNameComputed(false);
+        expectedDisplayName = "TestName";
+        place.setDisplayName(expectedDisplayName);
+
+        // Submit the updated resource to the service and store the response.
+        output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        commonPart = output.addPart(client.getItemCommonPartName(), place);
+        setupUpdate();        
+        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+        try {
+	        assertStatusCode(res, testName);
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = new PoxPayloadIn(res.getEntity());
-	        updatedPlace =
-	                (PlacesCommon) extractPart(input,
-	                        client.getItemCommonPartName(), PlacesCommon.class);
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        updatedPlace = (PlacesCommon) extractPart(input,
+	        		client.getItemCommonPartName(), PlacesCommon.class);
 	        Assert.assertNotNull(updatedPlace);
-	
-	        // Verify that the updated resource received the correct data.
-	        Assert.assertEquals(updatedPlace.isDisplayNameComputed(), false,
-	                "Updated displayNameComputed in Place did not match submitted data.");
-	        // Verify that the updated resource computes the right displayName.
-	        Assert.assertEquals(updatedPlace.getDisplayName(),
-	        		expectedDisplayName,
-	                "Updated DisplayName (not computed) in Place not stored.");
-	    } finally {
-	    	res.releaseConnection();
-	    }
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
+        }
+
+        // Verify that the updated resource received the correct data.
+        Assert.assertEquals(updatedPlace.isDisplayNameComputed(), false,
+                "Updated displayNameComputed in Place did not match submitted data.");
+        // Verify that the updated resource computes the right displayName.
+        Assert.assertEquals(updatedPlace.getDisplayName(),
+        		expectedDisplayName,
+                "Updated DisplayName (not computed) in Place not stored.");
     }
 
     /**
@@ -593,681 +285,147 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-    		groups = {"update"}, dependsOnMethods = {"verifyItemDisplayName"})
+    @Test(dataProvider="testName",
+            dependsOnMethods = {"verifyItemDisplayName"})
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup for read.
         setupRead();
 
         // Submit the request to the service and store the response.
         PlaceAuthorityClient client = new PlaceAuthorityClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-        assertStatusCode(res, testName);
-        
-        // Perform setup for update.
-        testSetup(STATUS_BAD_REQUEST, ServiceRequestType.UPDATE);
+        PlacesCommon place= null;
         try {
-	        // Check whether Place has expected displayName.
+            assertStatusCode(res, testName);        
 	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        PlacesCommon place = (PlacesCommon) extractPart(input,
+	        place = (PlacesCommon) extractPart(input,
 	                client.getItemCommonPartName(), PlacesCommon.class);
 	        Assert.assertNotNull(place);
-	        // Try to Update with computed false and no displayName
-	        place.setDisplayNameComputed(false);
-	        place.setDisplayName(null);
-	
-	        // Submit the updated resource to the service and store the response.
-	        PoxPayloadOut output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-	        PayloadOutputPart commonPart = output.addPart(place, MediaType.APPLICATION_XML_TYPE);
-	        commonPart.setLabel(client.getItemCommonPartName());
-					res.releaseConnection();
-	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-					assertStatusCode(res, testName);
- 	    } finally {
-	    	res.releaseConnection();
-	    }
-    }
-   
-
-    // Failure outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"read"}, dependsOnMethods = {"read"})
-    public void readNonExistent(String testName) {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupReadNonExistent();
-
-        // Submit the request to the service and store the response.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
-        try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	    } finally {
-	    	res.releaseConnection();
+                if (res != null) {
+                res.releaseConnection();
 	    }
-    }
-
-    /**
-     * Read item non existent.
-     *
-     * @param testName the test name
-     */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"read"}, dependsOnMethods = {"readItem"})
-    public void readItemNonExistent(String testName) {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
         }
-        // Perform setup.
-        setupReadNonExistent();
 
-        // Submit the request to the service and store the response.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
+    // Try to Update with computed false and no displayName
+        place.setDisplayNameComputed(false);
+        place.setDisplayName(null);
+        
+        // Submit the updated resource to the service and store the response.
+        PoxPayloadOut output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), place);
+        setupUpdateWithInvalidBody(); // we expected a failure here.
+        res = client.updateItem(knownResourceId, knownItemResourceId, output);
         try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	    } finally {
-	    	res.releaseConnection();
-	    }
-    }
-
-
-    // ---------------------------------------------------------------
-    // CRUD tests : READ_LIST tests
-    // ---------------------------------------------------------------
-    // Success outcomes
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"readList"}, dependsOnGroups = {"createList", "read"})
-    public void readList(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
+	    	assertStatusCode(res, testName);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        // Perform setup.
-        setupReadList();
-
-        // Submit the request to the service and store the response.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-        ClientResponse<AbstractCommonList> res = client.readList();
-        assertStatusCode(res, testName);
-        try {
-        	AbstractCommonList list = res.getEntity();
-	        // Optionally output additional data about list members for debugging.
-	        if(logger.isTraceEnabled()){
-	        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
-	        }
-	    } finally {
-	    	res.releaseConnection();
-	    }
     }
 
     /**
      * Read item list.
      */
-    @Test(groups = {"readList"}, dependsOnMethods = {"readList"})
-    public void readItemList() {
-        String testName = "readItemList";
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        readItemList(knownResourceId, null);
+    @Test(dataProvider = "testName", groups = {"readList"},
+               dependsOnMethods = {"readList"})
+    public void readItemList(String testName) {
+        readItemList(knownAuthorityWithItems, null);
     }
 
     /**
      * Read item list by authority name.
      */
-    @Test(groups = {"readList"}, dependsOnMethods = {"readItemList"})
-    public void readItemListByAuthorityName() {
-        String testName = "readItemListByAuthorityName";
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        readItemList(null, knownResourceShortIdentifer);
+    @Test(dataProvider = "testName", groups = {"readList"},
+    		dependsOnMethods = {"readItemList"})
+    public void readItemListByAuthorityName(String testName) {
+        readItemList(null, READITEMS_SHORT_IDENTIFIER);
     }
     
-    /**
-     * Read item list.
-     *
-     * @param vcsid the vcsid
-     * @param name the name
-     */
-    private void readItemList(String vcsid, String shortId) {
-
-        String testName = "readItemList";
-
-        // Perform setup.
-        setupReadList();
-        
-        // Submit the request to the service and store the response.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-        ClientResponse<AbstractCommonList> res = null;
-        if(vcsid!= null) {
-	        res = client.readItemList(vcsid, null, null);
-        } else if(shortId!= null) {
-   	        res = client.readItemListForNamedAuthority(shortId, null, null);
-        } else {
-        	Assert.fail("readItemList passed null csid and name!");
-        }
-        assertStatusCode(res, testName);
-        try {
-        	AbstractCommonList list = res.getEntity();
- 	
-	        List<AbstractCommonList.ListItem> items =
-	            list.getListItem();
-	        int nItemsReturned = items.size();
-	        // There will be one item created, associated with a
-	        // known parent resource, by the createItem test.
-	        //
-	        // In addition, there will be 'nItemsToCreateInList'
-	        // additional items created by the createItemList test,
-	        // all associated with the same parent resource.
-	        int nExpectedItems = nItemsToCreateInList + 1;
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": Expected "
-	           		+ nExpectedItems +" items; got: "+nItemsReturned);
-	        }
-	        Assert.assertEquals(nItemsReturned, nExpectedItems);
-	
-            for (AbstractCommonList.ListItem item : items) {
-            	String value = 
-            		AbstractCommonListUtils.ListItemGetElementValue(item, REFNAME);
-                Assert.assertTrue((null != value), "Item refName is null!");
-            	value = 
-            		AbstractCommonListUtils.ListItemGetElementValue(item, DISPLAYNAME);
-                Assert.assertTrue((null != value), "Item displayName is null!");
-            }
-            if(logger.isTraceEnabled()){
-            	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
-            }
-	    } finally {
-	    	res.releaseConnection();
-	    }
-    }
-
-
-    // Failure outcomes
-    // None at present.
-
-    // ---------------------------------------------------------------
-    // CRUD tests : UPDATE tests
-    // ---------------------------------------------------------------
-    // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"update"}, dependsOnGroups = {"read", "readList"})
-    public void update(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdate();
-
-        // Retrieve the contents of a resource to update.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-        ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-        try {
-	        if(logger.isDebugEnabled()){
-	            logger.debug("got PlaceAuthority to update with ID: " + knownResourceId);
-	        }
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        PlaceauthoritiesCommon placeAuthority = (PlaceauthoritiesCommon) extractPart(input,
-	                client.getCommonPartName(), PlaceauthoritiesCommon.class);
-	        Assert.assertNotNull(placeAuthority);
-	
-	        // Update the contents of this resource.
-	        placeAuthority.setDisplayName("updated-" + placeAuthority.getDisplayName());
-	        placeAuthority.setVocabType("updated-" + placeAuthority.getVocabType());
-	        if(logger.isDebugEnabled()){
-	            logger.debug("to be updated PlaceAuthority");
-	            logger.debug(objectAsXmlString(placeAuthority, PlaceauthoritiesCommon.class));
-	        }
-	
-	        // Submit the updated resource to the service and store the response.
-	        PoxPayloadOut output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_PAYLOAD_NAME);
-	        PayloadOutputPart commonPart = output.addPart(placeAuthority, MediaType.APPLICATION_XML_TYPE);
-	        commonPart.setLabel(client.getCommonPartName());
-	    	res.releaseConnection();
-	        res = client.update(knownResourceId, output);
-	        assertStatusCode(res, testName);	
-	        // Retrieve the updated resource and verify that its contents exist.
-	        input = new PoxPayloadIn(res.getEntity());
-	        PlaceauthoritiesCommon updatedPlaceAuthority =
-	                (PlaceauthoritiesCommon) extractPart(input,
-	                        client.getCommonPartName(), PlaceauthoritiesCommon.class);
-	        Assert.assertNotNull(updatedPlaceAuthority);
-	
-	        // Verify that the updated resource received the correct data.
-	        Assert.assertEquals(updatedPlaceAuthority.getDisplayName(),
-	                placeAuthority.getDisplayName(),
-	                "Data in updated object did not match submitted data.");
-	    } finally {
-	    	res.releaseConnection();
-	    }
-    }
-
-    /**
-     * Update item.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"update"}, dependsOnMethods = {"update"})
-    public void updateItem(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdate();
-
-        // Retrieve the contents of a resource to update.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-        ClientResponse<String> res =
-                client.readItem(knownResourceId, knownItemResourceId);
-				assertStatusCode(res, testName);
-        try {
-	        if(logger.isDebugEnabled()){
-	            logger.debug("got Place to update with ID: " +
-	                knownItemResourceId +
-	                " in PlaceAuthority: " + knownResourceId );
-	        }
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        PlacesCommon place = (PlacesCommon) extractPart(input,
-	                client.getItemCommonPartName(), PlacesCommon.class);
-	        Assert.assertNotNull(place);
-	
-	        // Update the contents of this resource.
-	        place.setCsid(null);
-	        setPrimaryPlaceName( place, "updated-" + getPrimaryPlaceName(place));
-	        if(logger.isDebugEnabled()){
-	            logger.debug("to be updated Place");
-	            logger.debug(objectAsXmlString(place,
-	                PlacesCommon.class));
-	        }        
-	
-	        // Submit the updated resource to the service and store the response.
-	        PoxPayloadOut output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-	        PayloadOutputPart commonPart = output.addPart(place, MediaType.APPLICATION_XML_TYPE);
-	        commonPart.setLabel(client.getItemCommonPartName());
-					res.releaseConnection();
-	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-					assertStatusCode(res, testName);
-	
-	        // Retrieve the updated resource and verify that its contents exist.
-	        input = new PoxPayloadIn(res.getEntity());
-	        PlacesCommon updatedPlace =
-	                (PlacesCommon) extractPart(input,
-	                        client.getItemCommonPartName(), PlacesCommon.class);
-	        Assert.assertNotNull(updatedPlace);
-	
-	        // Verify that the updated resource received the correct data.
-	        Assert.assertEquals(
-	        		getPrimaryPlaceName(updatedPlace),
-	        		getPrimaryPlaceName(place),
-	                "Data in updated Place did not match submitted data.");
-	    } finally {
-	    	res.releaseConnection();
-	    }
-    }
-
-    // Failure outcomes
-    // Placeholders until the three tests below can be uncommented.
-    // See Issue CSPACE-401.
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithEmptyEntityBody(java.lang.String)
-     */
-    @Override
-    public void updateWithEmptyEntityBody(String testName) throws Exception {
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithMalformedXml(java.lang.String)
-     */
-    @Override
-    public void updateWithMalformedXml(String testName) throws Exception {
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithWrongXmlSchema(java.lang.String)
-     */
-    @Override
-    public void updateWithWrongXmlSchema(String testName) throws Exception {
-    }
-
-
-    /* (non-Javadoc)
-	 * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
+	/**
+	 * Read item list.
+	 * 
+	 * @param vcsid
+	 *            the vcsid
+	 * @param name
+	 *            the name
 	 */
-@Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
-    public void updateNonExistent(String testName) throws Exception {
+	private void readItemList(String vcsid, String shortId) {
+		String testName = "readItemList";
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdateNonExistent();
+		// Perform setup.
+		setupReadList();
 
-        // Submit the request to the service and store the response.
-        // Note: The ID(s) used when creating the request payload may be arbitrary.
-        // The only relevant ID may be the one used in update(), below.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-   	String displayName = "displayName-NON_EXISTENT_ID";
-    	PoxPayloadOut multipart = PlaceAuthorityClientUtils.createPlaceAuthorityInstance(
-    				displayName, "nonEx", client.getCommonPartName());
-        ClientResponse<String> res =
-                client.update(NON_EXISTENT_ID, multipart);
-        try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	    } finally {
-	    	res.releaseConnection();
-	    }
-    }
+		// Submit the request to the service and store the response.
+		PlaceAuthorityClient client = new PlaceAuthorityClient();
+		ClientResponse<AbstractCommonList> res = null;
+		if (vcsid != null) {
+			res = client.readItemList(vcsid, null, null);
+		} else if (shortId != null) {
+			res = client.readItemListForNamedAuthority(shortId, null, null);
+		} else {
+			Assert.fail("readItemList passed null csid and name!");
+		}
+		
+		AbstractCommonList list = null;
+		try {
+			assertStatusCode(res, testName);
+			list = res.getEntity();
+		} finally {
+			if (res != null) {
+                res.releaseConnection();
+            }
+		}
+		
+		List<AbstractCommonList.ListItem> items = list.getListItem();
+		int nItemsReturned = items.size();
+		// There will be 'nItemsToCreateInList'
+		// items created by the createItemList test,
+		// all associated with the same parent resource.
+		int nExpectedItems = nItemsToCreateInList;
+		if (logger.isDebugEnabled()) {
+			logger.debug(testName + ": Expected " + nExpectedItems
+					+ " items; got: " + nItemsReturned);
+		}
+		Assert.assertEquals(nItemsReturned, nExpectedItems);
 
-    /**
-     * Update non existent item.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"update"}, dependsOnMethods = {"updateItem", "testItemSubmitRequest"})
-    public void updateNonExistentItem(String testName) throws Exception {
+		for (AbstractCommonList.ListItem item : items) {
+			String value = AbstractCommonListUtils.ListItemGetElementValue(
+					item, REFNAME);
+			Assert.assertTrue((null != value), "Item refName is null!");
+			value = AbstractCommonListUtils.ListItemGetElementValue(item,
+					DISPLAYNAME);
+			Assert.assertTrue((null != value), "Item displayName is null!");
+		}
+		if (logger.isTraceEnabled()) {
+			AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger,
+					testName);
+		}
+	}
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdateNonExistent();
-
-        // Submit the request to the service and store the response.
-        // Note: The ID used in this 'create' call may be arbitrary.
-        // The only relevant ID may be the one used in update(), below.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-        Map<String, String> nonexMap = new HashMap<String,String>();
-        nonexMap.put(PlaceJAXBSchema.DISPLAY_NAME, TEST_NAME);
-        nonexMap.put(PlaceJAXBSchema.SHORT_IDENTIFIER, "nonEx");
-        nonexMap.put(PlaceJAXBSchema.PLACE_TYPE, TEST_PLACE_TYPE);
-        nonexMap.put(PlaceJAXBSchema.TERM_STATUS, TEST_STATUS);
-        PoxPayloadOut multipart = 
-    	PlaceAuthorityClientUtils.createPlaceInstance(
-    			EMPTY_REFNAME, nonexMap, client.getItemCommonPartName() );
-        ClientResponse<String> res =
-                client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
-        try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	    } finally {
-	    	res.releaseConnection();
-	    }
-    }
-
-    // ---------------------------------------------------------------
-    // CRUD tests : DELETE tests
-    // ---------------------------------------------------------------
-    // Success outcomes
-
-    // Note: delete sub-resources in ascending hierarchical order,
-    // before deleting their parents.
-
-   /**
-    * Delete item.
-    *
-    * @param testName the test name
-    * @throws Exception the exception
-    */
-   @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        //groups = {"delete"}, dependsOnGroups = {"create", "read", "readList", "readListByPartialTerm", "update"})
-        groups = {"delete"}, dependsOnGroups = {"create", "read", "readList", "update"})
-    public void deleteItem(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupDelete();
-
-        if(logger.isDebugEnabled()){
-            logger.debug("parentcsid =" + knownResourceId +
-                " itemcsid = " + knownItemResourceId);
-        }
-
-        // Submit the request to the service and store the response.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-        ClientResponse<Response> res = 
-        	client.deleteItem(knownResourceId, knownItemResourceId);
-        try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	    } finally {
-	    	res.releaseConnection();
-	    }
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
-     */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"delete"}, dependsOnMethods = {"deleteItem"})
     public void delete(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupDelete();
-
-        if(logger.isDebugEnabled()){
-            logger.debug("parentcsid =" + knownResourceId);
-        }
-
-        // Submit the request to the service and store the response.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-        ClientResponse<Response> res = client.delete(knownResourceId);
-        try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	    } finally {
-	    	res.releaseConnection();
-	    }
+    	// Do nothing.  See localDelete().  This ensure proper test order.
+    }
+    
+    @Test(dataProvider = "testName", dependsOnMethods = {"localDeleteItem"})    
+    public void localDelete(String testName) throws Exception {
+    	super.delete(testName);
     }
 
-    // Failure outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
-     */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"delete"}, dependsOnMethods = {"delete"})
-    public void deleteNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupDeleteNonExistent();
-
-        // Submit the request to the service and store the response.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	    } finally {
-	    	res.releaseConnection();
-	    }
+    public void deleteItem(String testName) throws Exception {
+    	// Do nothing.  We need to wait until after the test "localDelete" gets run.  When it does,
+    	// its dependencies will get run first and then we can call the base class' delete method.
     }
-
-    /**
-     * Delete non existent item.
-     *
-     * @param testName the test name
-     */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"delete"}, dependsOnMethods = {"deleteItem"})
-    public void deleteNonExistentItem(String testName) {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupDeleteNonExistent();
-
-        // Submit the request to the service and store the response.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-        ClientResponse<Response> res = client.deleteItem(knownResourceId, NON_EXISTENT_ID);
-        try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	    } finally {
-	    	res.releaseConnection();
-	    }
+    
+    @Test(dataProvider = "testName", groups = {"delete"},
+    	dependsOnMethods = {"verifyIllegalItemDisplayName"})
+    public void localDeleteItem(String testName) throws Exception {
+    	super.deleteItem(testName);
     }
-
-    // ---------------------------------------------------------------
-    // Utility tests : tests of code used in tests above
-    // ---------------------------------------------------------------
-    /**
-     * Tests the code for manually submitting data that is used by several
-     * of the methods above.
-     */
-    @Test(dependsOnMethods = {"create", "read"})
-    public void testSubmitRequest() {
-
-        // Expected status code: 200 OK
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
-
-        // Submit the request to the service and store the response.
-        String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        int statusCode = submitRequest(method, url);
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("testSubmitRequest: url=" + url +
-                " status=" + statusCode);
-        }
-        Assert.assertEquals(statusCode, EXPECTED_STATUS);
-
-    }
-
-    /**
-     * Test item submit request.
-     */
-    @Test(dependsOnMethods = {"createItem", "readItem", "testSubmitRequest"})
-    public void testItemSubmitRequest() {
-
-        // Expected status code: 200 OK
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
-
-        // Submit the request to the service and store the response.
-        String method = ServiceRequestType.READ.httpMethodName();
-        String url = getItemResourceURL(knownResourceId, knownItemResourceId);
-        int statusCode = submitRequest(method, url);
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("testItemSubmitRequest: url=" + url +
-                " status=" + statusCode);
-        }
-        Assert.assertEquals(statusCode, EXPECTED_STATUS);
-
-    }
-
+    
     // ---------------------------------------------------------------
     // Cleanup of resources created during testing
     // ---------------------------------------------------------------
@@ -1299,21 +457,18 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         PlaceAuthorityClient client = new PlaceAuthorityClient();
         parentResourceId = knownResourceId;
         // Clean up item resources.
-        for (Map.Entry<String, String> entry : allItemResourceIdsCreated.entrySet()) {
+        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
             itemResourceId = entry.getKey();
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            ClientResponse<Response> res =
-                client.deleteItem(parentResourceId, itemResourceId);
-	    	res.releaseConnection();
+            client.deleteItem(parentResourceId, itemResourceId).releaseConnection();
         }
         // Clean up parent resources.
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            ClientResponse<Response> res = client.delete(resourceId);
-	    	res.releaseConnection();
+	    client.delete(resourceId).releaseConnection();
         }
     }
 
@@ -1356,5 +511,148 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         return getItemServiceRootURL(parentResourceIdentifier) + "/" + itemResourceIdentifier;
     }
 
+        @Override
+	public void authorityTests(String testName) {
+		// TODO Auto-generated method stub
+		
+	}
 
+	//
+	// Place specific overrides
+	//
+	
+	@Override
+	protected PoxPayloadOut createInstance(String commonPartName,
+			String identifier) {
+        // Submit the request to the service and store the response.
+        String shortId = identifier;
+    	String displayName = "displayName-" + shortId;
+    	// String baseRefName = PlaceAuthorityClientUtils.createPlaceAuthRefName(shortId, null);    	
+    	PoxPayloadOut result = 
+            PlaceAuthorityClientUtils.createPlaceAuthorityInstance(
+    	    displayName, shortId, commonPartName);
+		return result;
+	}
+	
+	@Override
+    protected PoxPayloadOut createNonExistenceInstance(String commonPartName, String identifier) {
+        String displayName = "displayName-NON_EXISTENT_ID";
+    	PoxPayloadOut result = PlaceAuthorityClientUtils.createPlaceAuthorityInstance(
+    				displayName, "nonEx", commonPartName);
+    	return result;
+    }
+
+	@Override
+	protected PlaceauthoritiesCommon updateInstance(PlaceauthoritiesCommon placeauthoritiesCommon) {
+		PlaceauthoritiesCommon result = new PlaceauthoritiesCommon();
+		
+		result.setDisplayName("updated-" + placeauthoritiesCommon.getDisplayName());
+		result.setVocabType("updated-" + placeauthoritiesCommon.getVocabType());
+		
+		return result;
+	}
+
+	@Override
+	protected void compareUpdatedInstances(PlaceauthoritiesCommon original,
+			PlaceauthoritiesCommon updated) throws Exception {
+        Assert.assertEquals(updated.getDisplayName(),
+        		original.getDisplayName(),
+                "Display name in updated object did not match submitted data.");
+	}
+
+	protected void compareReadInstances(PlaceauthoritiesCommon original,
+			PlaceauthoritiesCommon fromRead) throws Exception {
+        Assert.assertNotNull(fromRead.getDisplayName());
+        Assert.assertNotNull(fromRead.getShortIdentifier());
+        Assert.assertNotNull(fromRead.getRefName());
+	}
+	
+	//
+	// Authority item specific overrides
+	//
+	
+	@Override
+	protected String createItemInAuthority(String authorityId) {
+		return createItemInAuthority(authorityId, null /*refname*/);
+	}
+
+	@Override
+	protected PlacesCommon updateItemInstance(PlacesCommon placesCommon) {
+		
+                // Get the Name field from the resource passed in      
+                PlaceNameGroupList placeNameGroupList = placesCommon.getPlaceNameGroupList();
+                Assert.assertNotNull(placeNameGroupList);
+                List<PlaceNameGroup> placeNameGroups = placeNameGroupList.getPlaceNameGroup();
+                Assert.assertNotNull(placeNameGroups);
+                Assert.assertTrue(placeNameGroups.size() > 0);
+                String originalName = placeNameGroups.get(0).getName();
+                Assert.assertNotNull(originalName);
+                
+                // Update the contents of the new resource based on original value
+                PlaceNameGroupList updatedPlaceNameGroupList = new PlaceNameGroupList();
+                List<PlaceNameGroup> updatedPlaceNameGroups = updatedPlaceNameGroupList.getPlaceNameGroup();
+                PlaceNameGroup updatedPlaceNameGroup = new PlaceNameGroup();
+                updatedPlaceNameGroup.setName("updated-" + originalName);
+                updatedPlaceNameGroups.add(updatedPlaceNameGroup);
+                PlacesCommon result = new PlacesCommon();
+                result.setPlaceNameGroupList(updatedPlaceNameGroupList);
+        
+		result.setDisplayName("updated-" + placesCommon.getDisplayName());
+		
+		return result;
+	}
+
+	@Override
+	protected void compareUpdatedItemInstances(PlacesCommon original,
+			PlacesCommon updated) throws Exception {
+        
+                // Get the Name fields each resource passed in      
+                PlaceNameGroupList placeNameGroupList = original.getPlaceNameGroupList();
+                Assert.assertNotNull(placeNameGroupList);
+                List<PlaceNameGroup> placeNameGroups = placeNameGroupList.getPlaceNameGroup();
+                Assert.assertNotNull(placeNameGroups);
+                Assert.assertTrue(placeNameGroups.size() > 0);
+                String originalName = placeNameGroups.get(0).getName();
+                Assert.assertNotNull(originalName);
+            
+                PlaceNameGroupList updatedPlaceNameGroupList = updated.getPlaceNameGroupList();
+                Assert.assertNotNull(updatedPlaceNameGroupList);
+                List<PlaceNameGroup> updatedPlaceNameGroups = updatedPlaceNameGroupList.getPlaceNameGroup();
+                Assert.assertNotNull(updatedPlaceNameGroups);
+                Assert.assertTrue(updatedPlaceNameGroups.size() > 0);
+                String updatedName = updatedPlaceNameGroups.get(0).getName();
+                Assert.assertNotNull(updatedName);
+            
+            
+            
+            
+                Assert.assertEquals(updatedName, originalName,
+                    "Data in updated Place did not match submitted data.");
+	}
+
+	@Override
+	protected void verifyReadItemInstance(PlacesCommon item)
+			throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected PoxPayloadOut createNonExistenceItemInstance(
+			String commonPartName, String identifier) {
+        Map<String, String> nonexMap = new HashMap<String,String>();
+        nonexMap.put(PlaceJAXBSchema.NAME, TEST_NAME);
+        nonexMap.put(PlaceJAXBSchema.SHORT_IDENTIFIER, "nonEx");
+        nonexMap.put(PlaceJAXBSchema.PLACE_TYPE, TEST_PLACE_TYPE);
+        nonexMap.put(PlaceJAXBSchema.TERM_STATUS, TEST_STATUS);
+        // PoxPayloadOut multipart = 
+    	// PlaceAuthorityClientUtils.createPlaceInstance(
+    	//		PlaceAuthorityClientUtils.createPlaceRefName(knownResourceRefName, "nonEx", "Non Existent"), 
+    	//		nonexMap, client.getItemCommonPartName() );
+        final String EMPTY_REFNAME = "";
+        PoxPayloadOut result = 
+                PlaceAuthorityClientUtils.createPlaceInstance(EMPTY_REFNAME, 
+    			nonexMap, commonPartName);
+		return result;
+	}
 }
