@@ -13,13 +13,14 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.io.FileUtils;
 import org.collectionspace.services.PlaceJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
-import org.collectionspace.services.place.PlacesCommon;
 import org.collectionspace.services.place.PlaceauthoritiesCommon;
+import org.collectionspace.services.place.PlaceNameGroup;
+import org.collectionspace.services.place.PlaceNameGroupList;
+import org.collectionspace.services.place.PlacesCommon;
 import org.dom4j.DocumentException;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 
 public class PlaceAuthorityClientUtils {
     private static final Logger logger =
@@ -77,27 +78,18 @@ public class PlaceAuthorityClientUtils {
     	value = placeInfo.get(PlaceJAXBSchema.DISPLAY_NAME_COMPUTED);
     	displayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
 			place.setDisplayNameComputed(displayNameComputed);
-				/* TODO - think about how much to support. This approach to the client
-				 * does not scale! We should really favor the document/payload approach.
-        if((value = (String)placeInfo.get(PlaceJAXBSchema.CONDITION_NOTE))!=null) {
-            ConditionGroupList conditionGroupList = new ConditionGroupList();
-            List<ConditionGroup> conditionGroups = conditionGroupList.getConditionGroup();
-            ConditionGroup conditionGroup = new ConditionGroup();
-            conditionGroup.setConditionNote(value);
-            if((value = (String)placeInfo.get(PlaceJAXBSchema.CONDITION_NOTE_DATE))!=null)
-            	conditionGroup.setConditionNoteDate(value);
-            conditionGroups.add(conditionGroup);
-            place.setConditionGroupList(conditionGroupList);
+        /* TODO - think about how much to support. This approach to the client
+	 * does not scale! We should really favor the document/payload approach. */
+        if((value = (String)placeInfo.get(PlaceJAXBSchema.NAME))!=null) {
+            PlaceNameGroupList placeNameGroupList = new PlaceNameGroupList();
+            List<PlaceNameGroup> placeNameGroups = placeNameGroupList.getPlaceNameGroup();
+            PlaceNameGroup placeNameGroup = new PlaceNameGroup();
+            placeNameGroup.setName(value);
+            placeNameGroups.add(placeNameGroup);
+            place.setPlaceNameGroupList(placeNameGroupList);
         }
-        if((value = (String)placeInfo.get(PlaceJAXBSchema.SECURITY_NOTE))!=null)
-        	place.setSecurityNote(value);
-        if((value = (String)placeInfo.get(PlaceJAXBSchema.ACCESS_NOTE))!=null)
-        	place.setAccessNote(value);
-        if((value = (String)placeInfo.get(PlaceJAXBSchema.PLACE_TYPE))!=null)
-        	place.setPlaceType(value);
-        if((value = (String)placeInfo.get(PlaceJAXBSchema.ADDRESS))!=null)
-        	place.setAddress(value);
-					*/
+        
+					
         if((value = (String)placeInfo.get(PlaceJAXBSchema.TERM_STATUS))!=null)
         	place.setTermStatus(value);
 
