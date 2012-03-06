@@ -36,7 +36,7 @@ import org.collectionspace.services.objectexit.ObjectExitResource;
 import org.collectionspace.services.batch.BatchResource;
 import org.collectionspace.services.imports.ImportsResource;
 import org.collectionspace.services.location.LocationAuthorityResource;
-import org.collectionspace.services.concept.ConceptAuthorityResource;
+//import org.collectionspace.services.concept.ConceptAuthorityResource;
 import org.collectionspace.services.place.PlaceAuthorityResource;
 import org.collectionspace.services.taxonomy.TaxonomyAuthorityResource;
 import org.collectionspace.services.movement.MovementResource;
@@ -105,7 +105,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new OrgAuthorityResource());
         addResourceToMapAndSingletons(new LocationAuthorityResource());
         addResourceToMapAndSingletons(new TaxonomyAuthorityResource());
-        addResourceToMapAndSingletons(new ConceptAuthorityResource());
+        // addResourceToMapAndSingletons(new ConceptAuthorityResource());
         addResourceToMapAndSingletons(new PlaceAuthorityResource());
         addResourceToMapAndSingletons(new AcquisitionResource());
         addResourceToMapAndSingletons(new ContactResource());
