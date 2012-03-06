@@ -26,10 +26,11 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.place.PlacesCommon;
 /**
  * The Class PlaceAuthorityClient.
  */
-public class PlaceAuthorityClient extends AuthorityClientImpl<PlaceAuthorityProxy> {
+public class PlaceAuthorityClient extends AuthorityClientImpl<PlacesCommon, PlaceAuthorityProxy> {
 	public static final String SERVICE_NAME = "placeauthorities";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -62,8 +63,18 @@ public class PlaceAuthorityClient extends AuthorityClientImpl<PlaceAuthorityProx
         return getCommonPartName(SERVICE_ITEM_NAME);
     }
 
-	@Override
-	public Class<PlaceAuthorityProxy> getProxyClass() {
-		return PlaceAuthorityProxy.class;
-	}
+    @Override
+    public Class<PlaceAuthorityProxy> getProxyClass() {
+            return PlaceAuthorityProxy.class;
+    }
+
+    @Override
+    public String getInAuthority(PlacesCommon item) {
+            return item.getInAuthority();
+    }
+
+    @Override
+    public void setInAuthority(PlacesCommon item, String inAuthorityCsid) {
+            item.setInAuthority(inAuthorityCsid);
+    }
 }
