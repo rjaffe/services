@@ -32,7 +32,7 @@
         <module>common-api</module>
         <module>authentication</module>
         <module>authorization</module>
-        <module>blob</module>
+<!--        <module>blob</module>-->
         <module>client</module>
         <module>jaxb</module>
         <module>hyperjaxb</module>
@@ -58,10 +58,9 @@
         <module>batch</module>
         <module>imports</module>
         <module>location</module>
-<!--        <module>concept</module>-->
         <module>place</module>
         <module>taxonomy</module>
-        <module>movement</module>
+<!--        <module>movement</module>-->
         <module>report</module>
         <module>dimension</module>
         <module>contact</module>
