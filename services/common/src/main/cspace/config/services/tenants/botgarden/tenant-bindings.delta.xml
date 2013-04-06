@@ -338,7 +338,16 @@
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
-
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>taxonRank</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>taxonTermGroupList/[0]/termDisplayName</types:value>
+                </types:item>
+            </service:properties>
             <service:object xmlns:service="http://collectionspace.org/services/config/service" >
                 <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="taxon_naturalhistory" updated="" order="3">
                     <service:properties>
